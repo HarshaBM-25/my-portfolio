@@ -5,20 +5,52 @@ const routes = require('./routes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-const CORS_ORIGIN = (process.env.CORS_ORIGIN || 'http://localhost:3000').split(',');
 
-app.use(cors({ origin: CORS_ORIGIN }));
+// Allow multiple origins separated by commas
+const allowedOrigins = (
+  process.env.CORS_ORIGIN || 'http://localhost:3000'
+)
+  .split(',')
+  .map(origin => origin.trim());
+
+console.log('Allowed CORS origins:', allowedOrigins);
+
+// Custom CORS handler
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      // Allow Postman / server-to-server requests
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      console.log('Blocked by CORS:', origin);
+      return callback(new Error('Not allowed by CORS'));
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  })
+);
+
 app.use(express.json({ limit: '2mb' }));
 
 app.use('/api', routes);
 
 app.get('/', (req, res) => {
-  res.json({ ok: true, message: 'Portfolio-wiki API is running. See /api/page-data.' });
+  res.json({
+    ok: true,
+    message: 'Portfolio-wiki API is running. See /api/page-data.',
+  });
 });
 
 app.use((err, req, res, next) => {
   console.error(err);
-  res.status(500).json({ error: 'Something went wrong on the server.' });
+  res.status(500).json({
+    error: err.message || 'Something went wrong on the server.',
+  });
 });
 
 app.listen(PORT, () => {
