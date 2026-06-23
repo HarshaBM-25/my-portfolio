@@ -8,7 +8,7 @@ const router = express.Router();
 
 // ---------------------------------------------------------------------
 // File uploads (photo, resume) — saved to /uploads, served statically
-// by server.js. Admin-only
+// by server.js. Admin-onlyy
 // ---------------------------------------------------------------------
 const upload = multer({
   storage: multer.memoryStorage(),
