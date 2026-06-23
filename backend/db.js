@@ -1,9 +1,9 @@
-require('dotenv').config();
-const { Pool } = require('pg');
-
 const pool = new Pool(
   process.env.DATABASE_URL
-    ? { connectionString: process.env.DATABASE_URL }
+    ? {
+        connectionString: process.env.DATABASE_URL,
+        ssl: { rejectUnauthorized: false },
+      }
     : {
         user: process.env.PGUSER || 'postgres',
         password: process.env.PGPASSWORD || 'postgres',
@@ -12,9 +12,3 @@ const pool = new Pool(
         database: process.env.PGDATABASE || 'portfolio_wiki',
       }
 );
-
-pool.on('error', (err) => {
-  console.error('Unexpected Postgres error', err);
-});
-
-module.exports = pool;
