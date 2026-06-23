@@ -1,0 +1,9 @@
+node_modules/
+.env
+uploads/*
+!uploads/.gitkeep
+!uploads/resume_final.pdf
+node_modules
+.env
+.next
+backend/uploads

@@ -1,0 +1,84 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Wiki color tokens as CSS variables — swapping .dark on a single
+   ancestor retheme everything that uses var(--wiki-*), no per-component
+   dark: variants needed. */
+:root {
+  --wiki-bg: #ffffff;
+  --wiki-text: #202122;
+  --wiki-subtle: #54595d;
+  --wiki-border: #a2a9b1;
+  --wiki-link: #0645ad;
+  --wiki-panel: #f8f9fa;
+  --wiki-infobox: #eaecf0;
+}
+
+.dark {
+  --wiki-bg: #101418;
+  --wiki-text: #e8e9ea;
+  --wiki-subtle: #a2a6ad;
+  --wiki-border: #3c4146;
+  --wiki-link: #8ab4f8;
+  --wiki-panel: #18191a;
+  --wiki-infobox: #232830;
+}
+
+html,
+body {
+  background: var(--wiki-bg);
+  color: var(--wiki-text);
+}
+
+.wiki-h2 {
+  font-size: 1.6rem;
+  font-weight: 400;
+  line-height: 1.3;
+  border-bottom: 1px solid var(--wiki-border);
+  padding-bottom: 0.2rem;
+  margin-top: 1.6rem;
+  margin-bottom: 0.6rem;
+  color: var(--wiki-text);
+}
+
+.wiki-h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-top: 1.1rem;
+  margin-bottom: 0.4rem;
+  color: var(--wiki-text);
+}
+
+.wiki-link {
+  color: var(--wiki-link);
+  text-decoration: none;
+}
+.wiki-link:hover {
+  text-decoration: underline;
+}
+
+.wiki-body p {
+  margin-bottom: 0.85rem;
+  line-height: 1.65;
+}
+
+:focus-visible {
+  outline: 2px solid var(--wiki-link);
+  outline-offset: 2px;
+}
+
+.search-highlight {
+  animation: wiki-flash 1.6s ease-out;
+}
+@keyframes wiki-flash {
+  0% { background-color: rgba(10, 99, 207, 0.18); }
+  100% { background-color: transparent; }
+}
+.dark .search-highlight {
+  animation-name: wiki-flash-dark;
+}
+@keyframes wiki-flash-dark {
+  0% { background-color: rgba(138, 180, 248, 0.22); }
+  100% { background-color: transparent; }
+}
