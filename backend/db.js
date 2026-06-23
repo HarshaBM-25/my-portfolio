@@ -1,3 +1,6 @@
+require('dotenv').config();
+const { Pool } = require('pg');
+
 const pool = new Pool(
   process.env.DATABASE_URL
     ? {
@@ -12,3 +15,9 @@ const pool = new Pool(
         database: process.env.PGDATABASE || 'portfolio_wiki',
       }
 );
+
+pool.on('error', (err) => {
+  console.error('Unexpected Postgres error', err);
+});
+
+module.exports = pool;
