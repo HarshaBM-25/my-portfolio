@@ -3,27 +3,47 @@ const multer = require('multer');
 const path = require('path');
 const pool = require('./db');
 const { login, requireAdmin } = require('./auth');
-
+const supabase = require('./supabase');
 const router = express.Router();
 
 // ---------------------------------------------------------------------
 // File uploads (photo, resume) — saved to /uploads, served statically
 // by server.js. Admin-only.
 // ---------------------------------------------------------------------
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, path.join(__dirname, 'uploads')),
-  filename: (req, file, cb) => {
-    const safeName = Date.now() + '-' + file.originalname.replace(/[^a-zA-Z0-9.\-_]/g, '_');
-    cb(null, safeName);
-  },
-});
-const upload = multer({ storage, limits: { fileSize: 10 * 1024 * 1024 } });
-
-router.post('/upload', requireAdmin, upload.single('file'), (req, res) => {
-  if (!req.file) return res.status(400).json({ error: 'No file received' });
-  res.json({ url: `/uploads/${req.file.filename}` });
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 10 * 1024 * 1024 }
 });
 
+router.post('/upload', requireAdmin, upload.single('file'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No file received' });
+    }
+
+    const safeName =
+      Date.now() + '-' + req.file.originalname.replace(/[^a-zA-Z0-9.\-_]/g, '_');
+
+    const { data, error } = await supabase.storage
+      .from('uploads')
+      .upload(safeName, req.file.buffer, {
+        contentType: req.file.mimetype
+      });
+
+    if (error) {
+      return res.status(500).json({ error: error.message });
+    }
+
+    const { data: publicUrlData } = supabase.storage
+      .from('uploads')
+      .getPublicUrl(data.path);
+
+    res.json({ url: publicUrlData.publicUrl });
+
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 // ---------------------------------------------------------------------
 // Auth
 // ---------------------------------------------------------------------
