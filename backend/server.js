@@ -6,23 +6,17 @@ const routes = require('./routes');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Allow multiple origins separated by commas
-const allowedOrigins = (
-  process.env.CORS_ORIGIN || 'http://localhost:3000'
-)
-  .split(',')
-  .map(origin => origin.trim());
-
-console.log('Allowed CORS origins:', allowedOrigins);
-
-// Custom CORS handler
 app.use(
   cors({
     origin: function (origin, callback) {
-      // Allow Postman / server-to-server requests
+      // Allow Postman / direct server requests
       if (!origin) return callback(null, true);
 
-      if (allowedOrigins.includes(origin)) {
+      const allowed =
+        origin === 'http://localhost:3000' ||
+        origin.endsWith('.vercel.app');
+
+      if (allowed) {
         return callback(null, true);
       }
 
